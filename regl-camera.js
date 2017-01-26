@@ -28,7 +28,7 @@ function createCamera (regl, props_) {
   }
 
   var noScroll = typeof props.noScroll !== 'undefined' ? prop.noScroll : true
-  var damping = typeof props.damping !== 'undefined' ? props.damping : 0.9
+  var damping = typeof props.damping !== 'undefined' ? props.damping : 0
   var speed = typeof props.speed !== 'undefined' ? props.speed : 4
 
   var right = new Float32Array([1, 0, 0])
