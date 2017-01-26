@@ -24,10 +24,12 @@ function createCamera (regl, props_) {
     far: typeof props.far !== 'undefined' ? props.far : 1000.0,
     flipY: !!props.flipY,
     dtheta: 0,
-    dphi: 0
+    dphi: 0,
   }
 
+  var noScroll = typeof props.noScroll !== 'undefined' ? prop.noScroll : true
   var damping = typeof props.damping !== 'undefined' ? props.damping : 0.9
+  var speed = typeof props.speed !== 'undefined' ? props.speed : 4
 
   var right = new Float32Array([1, 0, 0])
   var front = new Float32Array([0, 0, 1])
@@ -45,17 +47,16 @@ function createCamera (regl, props_) {
       if (buttons & 1) {
         var dx = (x - prevX) / window.innerWidth
         var dy = (y - prevY) / window.innerHeight
-        var w = Math.max(cameraState.distance, 0.5)
 
-        cameraState.dtheta += w * dx
-        cameraState.dphi += w * dy
+        cameraState.dtheta += speed * dx
+        cameraState.dphi += speed * dy
       }
       prevX = x
       prevY = y
     })
     mouseWheel(function (dx, dy) {
       ddistance += dy / window.innerHeight
-    })
+    }, noScroll)
   }
 
   function damp (x) {
