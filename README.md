@@ -4,7 +4,7 @@ A basic reusable "turntable" camera component for [regl](http://regl.party).  (S
 
 ## THIS FORK
 
-***Is a fork of `regl-camera` published separately at @rreusser/regl-camera.***
+***Is a fork of [`regl-camera`](https://github.com/regl-project/regl-camera) published separately at @rreusser/regl-camera.***
 
 ## Example
 
