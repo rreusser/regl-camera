@@ -3,15 +3,22 @@ var mouseWheel = require('mouse-wheel')
 var identity = require('gl-mat4/identity')
 var perspective = require('gl-mat4/perspective')
 var lookAt = require('gl-mat4/lookAt')
+var invert = require('gl-mat4/invert')
 
 module.exports = createCamera
 
 var isBrowser = typeof window !== 'undefined'
 
 function createCamera (regl, props_) {
+  var element = regl._gl.canvas;
+  element.addEventListener('mousewheel', function (e) {
+    e.preventDefault();
+  });
+
   var props = props_ || {}
   var cameraState = {
     view: identity(new Float32Array(16)),
+    iview: identity(new Float32Array(16)),
     projection: identity(new Float32Array(16)),
     center: new Float32Array(props.center || 3),
     theta: props.theta || 0,
@@ -19,20 +26,20 @@ function createCamera (regl, props_) {
     distance: Math.log(props.distance || 10.0),
     eye: new Float32Array(3),
     up: new Float32Array(props.up || [0, 1, 0]),
+    right: new Float32Array(props.right || [1, 0, 0]),
+    front: new Float32Array(props.front || [0, 0, 1]),
     fovy: props.fovy || Math.PI / 4.0,
     near: typeof props.near !== 'undefined' ? props.near : 0.01,
     far: typeof props.far !== 'undefined' ? props.far : 1000.0,
+    aspect: 1.0,
     flipY: !!props.flipY,
     dtheta: 0,
-    dphi: 0,
+    dphi: 0
   }
 
-  var noScroll = typeof props.noScroll !== 'undefined' ? prop.noScroll : true
-  var damping = typeof props.damping !== 'undefined' ? props.damping : 0
-  var speed = typeof props.speed !== 'undefined' ? props.speed : 4
+  var iview = [];
 
-  var right = new Float32Array([1, 0, 0])
-  var front = new Float32Array([0, 0, 1])
+  var damping = typeof props.damping !== 'undefined' ? props.damping : 0.0
 
   var minDistance = Math.log('minDistance' in props ? props.minDistance : 0.1)
   var maxDistance = Math.log('maxDistance' in props ? props.maxDistance : 1000)
@@ -47,16 +54,17 @@ function createCamera (regl, props_) {
       if (buttons & 1) {
         var dx = (x - prevX) / window.innerWidth
         var dy = (y - prevY) / window.innerHeight
+        var w = Math.max(cameraState.distance, 0.5)
 
-        cameraState.dtheta += speed * dx
-        cameraState.dphi += speed * dy
+        cameraState.dtheta += w * dx
+        cameraState.dphi += w * dy
       }
       prevX = x
       prevY = y
     })
     mouseWheel(function (dx, dy) {
       ddistance += dy / window.innerHeight
-    }, noScroll)
+    })
   }
 
   function damp (x) {
@@ -72,6 +80,9 @@ function createCamera (regl, props_) {
   }
 
   function updateCamera (props) {
+    if (props && props.dtheta) {
+      props.dtheta += cameraState.dtheta;
+    }
     Object.keys(props).forEach(function (prop) {
       cameraState[prop] = props[prop]
     })
@@ -105,10 +116,11 @@ function createCamera (regl, props_) {
     var vu = r * Math.sin(phi)
 
     for (var i = 0; i < 3; ++i) {
-      eye[i] = center[i] + vf * front[i] + vr * right[i] + vu * up[i]
+      eye[i] = center[i] + vf * cameraState.front[i] + vr * cameraState.right[i] + vu * up[i]
     }
 
     lookAt(cameraState.view, eye, center, up)
+    invert(cameraState.iview, cameraState.view);
   }
 
   var injectContext = regl({
@@ -121,6 +133,9 @@ function createCamera (regl, props_) {
           cameraState.far)
         if (cameraState.flipY) { cameraState.projection[5] *= -1 }
         return cameraState.projection
+      },
+      aspect: function (context) {
+        return context.viewportWidth / context.viewportHeight
       }
     }),
     uniforms: Object.keys(cameraState).reduce(function (uniforms, name) {
@@ -137,6 +152,8 @@ function createCamera (regl, props_) {
     updateCamera(props)
     injectContext(block)
   }
+
+  setupCamera.state = cameraState;
 
   Object.keys(cameraState).forEach(function (name) {
     setupCamera[name] = cameraState[name]

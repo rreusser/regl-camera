@@ -1,5 +1,10 @@
-# regl-camera
+# @rreusser/regl-camera
 A basic reusable "turntable" camera component for [regl](http://regl.party).  (Secretly just [spherical coordinates](https://en.wikipedia.org/wiki/Spherical_coordinate_system).)
+
+
+## THIS FORK
+
+***Is a fork of `regl-camera` published separately at @rreusser/regl-camera.***
 
 ## Example
 

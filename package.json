@@ -1,5 +1,5 @@
 {
-  "name": "regl-camera",
+  "name": "@rreusser/regl-camera",
   "version": "1.1.0",
   "description": "Camera for regl",
   "main": "regl-camera.js",
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mikolalysenko/regl-camera.git"
+    "url": "git+https://github.com/rreusser/regl-camera.git"
   },
   "keywords": [
     "regl",
@@ -35,7 +35,7 @@
   "author": "Mikola Lysenko",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mikolalysenko/regl-camera/issues"
+    "url": "https://github.com/rreusser/regl-camera/issues"
   },
-  "homepage": "https://github.com/mikolalysenko/regl-camera#readme"
+  "homepage": "https://github.com/rreusser/regl-camera#readme"
 }
